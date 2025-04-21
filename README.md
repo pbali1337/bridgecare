@@ -20,6 +20,45 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Environment Variables
+
+This project requires several environment variables to be set up for full functionality:
+
+1. Copy `.env.local.sample` to `.env.local` and fill in your API keys:
+   - `NEXT_PUBLIC_SUPABASE_URL` - Your Supabase project URL
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Your Supabase anonymous key
+   - `OPENAI_API_KEY` - Your OpenAI API key
+   - `NEXT_PUBLIC_VAPI_API_KEY` - Your VAPI API key (for voice agent functionality)
+
+## Deployment on Vercel
+
+The project is optimized for deployment on Vercel. Follow these steps to deploy:
+
+1. Push your code to a Git repository (GitHub, GitLab, or Bitbucket)
+2. Visit [Vercel](https://vercel.com/new) and import your repository
+3. Configure your project:
+   - Set the framework preset to "Next.js"
+   - Add all required environment variables from your `.env.local` file
+   - Click "Deploy"
+
+### Vercel Production Deployment
+
+For production deployment, use the following command if deploying from the CLI:
+
+```bash
+vercel --prod
+```
+
+The project includes a properly configured `vercel.json` file that sets up:
+- Build and development commands
+- Output directory
+- Framework detection
+- Region configuration
+
+### Static Files
+
+Static files like `test.html` are placed in the `public` directory and can be accessed directly at the root URL path (e.g., `https://your-domain.com/test.html`).
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

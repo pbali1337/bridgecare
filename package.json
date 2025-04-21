@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -16,10 +16,10 @@
     "@vapi-ai/web": "^2.2.5",
     "dotenv": "^16.4.7",
     "microsoft-cognitiveservices-speech-sdk": "^1.42.0",
-    "next": "15.2.2",
+    "next": "^15.2.2",
     "openai": "^4.91.1",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
     "react-hot-toast": "^2.5.2",
     "react-markdown": "^10.1.0",
     "sharp": "^0.33.5"
