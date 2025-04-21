@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[Doctor's office] Pre-consult</title>
+    <style>
+        /* Add your CSS here */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        #chat-container {
+            width: 100%;
+            max-width: 600px;
+            height: 400px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            overflow-y: scroll;
+            margin-bottom: 20px;
+        }
+
+        #input-container {
+            display: flex;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        #user-input {
+            width: 80%;
+            padding: 10px;
+            margin-right: 10px;
+        }
+
+        #send-btn {
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        .message {
+            margin: 10px 0;
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        .user-message {
+            background-color: #f1f1f1;
+            align-self: flex-end;
+        }
+
+        .bot-message {
+            background-color: #e1f7d5;
+            align-self: flex-start;
+        }
+    </style>
+</head>
+<body>
+    <h1>Hygee</h1>
+    <div id="chat-container">
+        <div id="chat-log"></div>
+    </div>
+    <div id="input-container">
+        <input type="text" id="user-input" placeholder="Type your message..." />
+        <button id="send-btn">Send</button>
+    </div>
+
+    <script>
+        const chatLog = document.getElementById("chat-log");
+        const userInput = document.getElementById("user-input");
+        const sendBtn = document.getElementById("send-btn");
+
+        // The conversation history is now stored outside the sendMessage function to persist across messages
+        let conversationHistory = [
+            { 
+                role: "system", 
+                content: "You are Roberta, an assistant at a doctor's office. You are friendly and professional, but not overly chummy. You should respond politely but not overly drawn out, kind of curt, and politely decline to answer anything that's not related to this specific user and their illness. You begin the user by asking about their symptoms. Then, if relevant, you ask the user about their medical history. Conversation with the user should flow naturally. In the end, if the user is out of symptoms to report (you should sense when this point happens), you generate a list of helpful things to ask a proper physician afterward, in bullet points. You're super nice and helpful and have the personality of a vibrant young woman in their early 20s / late teens. You only answer medical questions, literally only medical questions, anything else you politely decline to answer."
+            },
+            { 
+                role: "user", 
+                content: "Welcome to [doctor's office]! How may I assist you today? 😊"
+            }
+        ];
+
+        sendBtn.addEventListener("click", sendMessage);
+        userInput.addEventListener("keypress", (event) => {
+            if (event.key === "Enter") sendMessage();
+        });
+
+        // Add the initial greeting message when the page loads
+        window.onload = () => {
+            addMessage("Welcome to [doctor's office]! How may I assist you today? 😊", "bot-message");
+        };
+
+        async function sendMessage() {
+            let userText = userInput.value.trim();
+            if (!userText) return;
+
+            addMessage("You: " + userText, "user-message");
+            userInput.value = "";
+
+            let response = await sendToAssistant(userText);
+            addMessage("Assistant: " + response, "bot-message");
+        }
+
+        async function sendToAssistant(text) {
+            console.log("Sending request to Assistant API...");
+
+            // Add the user's message to the conversation history
+            conversationHistory.push({ role: "user", content: text });
+
+            try {
+                // Use our Next.js API endpoint instead of directly calling OpenAI
+                const response = await fetch("/api/openai", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        messages: conversationHistory
+                    })
+                });
+
+                console.log("API Response Status:", response.status);
+                const responseData = await response.json();
+                console.log("API Response Data:", responseData);
+
+                if (!response.ok) {
+                    console.error("API Response Error:", responseData);
+                    throw new Error(responseData.error || "Failed to fetch Assistant response");
+                }
+
+                const assistantMessage = responseData.message?.content || "Sorry, I didn't get that.";
+
+                // Add the assistant's message to the conversation history
+                conversationHistory.push({ role: "assistant", content: assistantMessage });
+
+                return assistantMessage;
+            } catch (error) {
+                console.error("API Error:", error);
+                return "Oops! Something went wrong.";
+            }
+        }
+
+        function addMessage(message, className) {
+            let msgDiv = document.createElement("div");
+            msgDiv.textContent = message;
+            msgDiv.classList.add("message", className);
+            chatLog.appendChild(msgDiv);
+            chatLog.scrollTop = chatLog.scrollHeight; // Auto-scroll to latest message
+        }
+    </script>
+</body>
+</html>
